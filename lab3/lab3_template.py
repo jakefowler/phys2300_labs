@@ -42,13 +42,24 @@ def parse_data(infile):
     :return: two lists. One list with the information from the third column (date)
                         One list with the information from the fourth column (temperature)
     """
+ 
     wdates = []             # list of dates data
     wtemperatures = []      # list of temperarture data
 
+    with open(infile, mode='r') as file:
+        data = file.readlines()[1:]
+
+        for line in data:
+            values = line.split()
+            date = values[2]
+            wdates.append([float(date[0:4]), float(date[4:6]), float(date[6:]), float(values[3])])
+            wtemperatures.append(values[3])
+        
+    file.close()
+
     return wdates, wtemperatures
 
-
-def calc_mean_std_dev(wdates, wtemp):
+def calc_mean_std_dev(wdates_temp, wtemp):
     """
     Calculate the mean temperature per month
     Calculate the standard deviation per month's mean
@@ -58,10 +69,21 @@ def calc_mean_std_dev(wdates, wtemp):
     """
     means = []
     std_dev = []
+    temp_list = []
+    wdates_temp.sort(key = lambda x: x[1])
 
+    month = 1.0
+    for val in wdates_temp:
+        if val[1] > month:
+            month += 1
+            means.append(np.mean(temp_list))
+            std_dev.append(np.std(temp_list))
+            temp_list.clear()
+        temp_list.append(val[3])
+        
+    means.append(np.mean(temp_list))
+    std_dev.append(np.std(temp_list))
     return means, std_dev
-
-
 
 def plot_data_task1(wyear, wtemp, month_mean, month_std):
     """
@@ -110,15 +132,15 @@ def main(infile):
     month_mean, month_std = calc_mean_std_dev(wdates, wtemperatures)
     # TODO: Make sure you have a list of:
     #       1) years, 2) temperature, 3) month_mean, 4) month_std
-    plot_data_task1(wyear, wtemp, month_mean, month_std)
+    plot_data_task1(np.array(wdates)[:,0].tolist(), np.array(wdates)[:,-1].tolist(), month_mean, month_std)
     # TODO: Create the data you need for this
     # plot_data_task2(xxx)
 
 
 
 if __name__ == "__main__":
-    # infile = 'data/CDO6674605799016.txt'  # for testing
+    infile = 'data/CDO6674605799016.txt'  # for testing
     # Note: the 0th argument is the program itself.
-    infile = sys.argv[1]
+    #infile = sys.argv[1]
     main(infile)
-    exit(0)
+    # exit(0)
