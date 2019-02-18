@@ -39,12 +39,12 @@ def parse_data(infile):
     """
     Function to parse weather data
     :param infile: weather data input file
-    :return: two lists. One list with the information from the third column (date)
-                        One list with the information from the fourth column (temperature)
+    :return: two lists. One list with the information from the third column (date) and the fourth column (temperature)
+                        One list with the information from the third column (date) and the 11th (min) and 12th column (max temp)
     """
  
-    wdates = []             # list of dates data
-    wtemperatures = []      # list of temperarture data
+    wdates_and_temp = []    # list of dates data broken up into year, month, day, and then the temperature for that day
+    wdates_min_max = []     # list of year along with min and max temperatures for each day
 
     with open(infile, mode='r') as file:
         data = file.readlines()[1:]
@@ -52,14 +52,14 @@ def parse_data(infile):
         for line in data:
             values = line.split()
             date = values[2]
-            wdates.append([float(date[0:4]), float(date[4:6]), float(date[6:]), float(values[3])])
-            wtemperatures.append(values[3])
+            wdates_and_temp.append([float(date[0:4]), float(date[4:6]), float(date[6:]), float(values[3])])
+            wdates_min_max.append([float(date[0:4]), float(values[18]), float(values[17])])
         
     file.close()
 
-    return wdates, wtemperatures
+    return wdates_and_temp, wdates_min_max
 
-def calc_mean_std_dev(wdates_temp, wtemp):
+def calc_mean_std_dev(wdates_and_temp):
     """
     Calculate the mean temperature per month
     Calculate the standard deviation per month's mean
@@ -70,10 +70,10 @@ def calc_mean_std_dev(wdates_temp, wtemp):
     means = []
     std_dev = []
     temp_list = []
-    wdates_temp.sort(key = lambda x: x[1])
+    wdates_and_temp.sort(key = lambda x: x[1])
 
     month = 1.0
-    for val in wdates_temp:
+    for val in wdates_and_temp:
         if val[1] > month:
             month += 1
             means.append(np.mean(temp_list))
@@ -114,6 +114,31 @@ def plot_data_task1(wyear, wtemp, month_mean, month_std):
     plt.xticks(monthNumber, months)
     plt.show()      # display plot
 
+def calc_min_max(wdates_min_max):
+    """
+    Function that finds the min and max temperature for each year and then returns it as a list.
+    :param: wdates_min_max: list that contains the year, min, and max temperatures
+    :returns: year_min_max: list with the min and max temperature of each year
+    """
+    year_min_max = []
+    min_temp = 212
+    max_temp = 0
+    wdates_min_max.sort(key = lambda x: x[0])
+    year = wdates_min_max[0][0] 
+    for val in wdates_min_max:
+        if val[0] > year:
+            year_min_max.append([year, min_temp, max_temp])
+            year = val[0]
+            min_temp = val[1]
+            max_temp = val[2]
+        if val[1] < min_temp:
+            min_temp = val[1]
+        if val[2] > max_temp and val[2] < 200:
+            max_temp = val[2]
+    year_min_max.append([year, min_temp, max_temp])
+
+    return year_min_max
+
 
 def plot_data_task2(xxx):
     """
@@ -127,13 +152,14 @@ def plot_data_task2(xxx):
 
 def main(infile):
     weather_data = infile    # take data file as input parameter to file
-    wdates, wtemperatures = parse_data(weather_data)
+    wdates_and_temp, wdates_min_max = parse_data(weather_data)
     # Calculate mean and standard dev per month
-    month_mean, month_std = calc_mean_std_dev(wdates, wtemperatures)
+    month_mean, month_std = calc_mean_std_dev(wdates_and_temp)
     # TODO: Make sure you have a list of:
     #       1) years, 2) temperature, 3) month_mean, 4) month_std
-    plot_data_task1(np.array(wdates)[:,0].tolist(), np.array(wdates)[:,-1].tolist(), month_mean, month_std)
+    plot_data_task1(np.array(wdates_and_temp)[:,0].tolist(), np.array(wdates_and_temp)[:,-1].tolist(), month_mean, month_std)
     # TODO: Create the data you need for this
+    year_min_max = calc_min_max(wdates_min_max)
     # plot_data_task2(xxx)
 
 
