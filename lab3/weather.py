@@ -40,7 +40,7 @@ def parse_data(infile):
     Function to parse weather data
     :param infile: weather data input file
     :return: two lists. One list with the information from the third column (date) and the fourth column (temperature)
-                        One list with the information from the third column (date) and the 11th (min) and 12th column (max temp)
+                        One list with the information from the third column (date) and the 18th (min) and 19th column (max temp)
     """
  
     wdates_and_temp = []    # list of dates data broken up into year, month, day, and then the temperature for that day
@@ -140,14 +140,22 @@ def calc_min_max(wdates_min_max):
     return year_min_max
 
 
-def plot_data_task2(xxx):
+def plot_data_task2(year_min_max):
     """
-    Create plot for Task 2. Describe in here what you are plotting
-    Also modify the function to take the params you think you will need
-    to plot the requirements.
-    :param: xxx??
+    Function that plots the min and max temperatures for each year
+    :param: year_min_max: list that holds the year and the min and max temperatures for that year
     """
-    pass
+    year = np.array(year_min_max)[:,0].tolist()
+    min = np.array(year_min_max)[:,1].tolist()
+    max = np.array(year_min_max)[:,2].tolist()
+    plt.plot(year, min, "bo", label="Minimum Temp")
+    plt.plot(year, max, "ro", label="Maximum Temp")
+    plt.ylabel("Temperature, F")
+    plt.xlabel("Year")
+    plt.title("Min and Max Temperature by Year")
+    plt.legend()
+    plt.show()
+
 
 
 def main(infile):
@@ -155,18 +163,16 @@ def main(infile):
     wdates_and_temp, wdates_min_max = parse_data(weather_data)
     # Calculate mean and standard dev per month
     month_mean, month_std = calc_mean_std_dev(wdates_and_temp)
-    # TODO: Make sure you have a list of:
-    #       1) years, 2) temperature, 3) month_mean, 4) month_std
+    #               1) years,                                 2) temperature,                       3) month_mean, 4) month_std
     plot_data_task1(np.array(wdates_and_temp)[:,0].tolist(), np.array(wdates_and_temp)[:,-1].tolist(), month_mean, month_std)
-    # TODO: Create the data you need for this
     year_min_max = calc_min_max(wdates_min_max)
-    # plot_data_task2(xxx)
+    plot_data_task2(year_min_max)
 
 
 
 if __name__ == "__main__":
-    infile = 'data/CDO6674605799016.txt'  # for testing
+    # infile = 'data/CDO6674605799016.txt'  # for testing
     # Note: the 0th argument is the program itself.
-    #infile = sys.argv[1]
+    infile = sys.argv[1]
     main(infile)
     # exit(0)
