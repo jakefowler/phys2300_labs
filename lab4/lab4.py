@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import scipy
 import pandas as pd
+import csv
 
 # https://youtu.be/-zvHQXnBO6c
 
@@ -22,7 +23,6 @@ def read_wx_data(wx_file, harbor_data):
     harbor_data["wx_times"] = data["Time"] #.tolist()
     harbor_data["wx_temperatures"] = data["Ch1:Deg F"] #.tolist()
     #print(harbor_data)
-    
 
 def read_gps_data(gps_file, harbor_data):
     """
@@ -32,12 +32,17 @@ def read_gps_data(gps_file, harbor_data):
     :param harbor_data: A dictionary to collect data.
     :return: Nothing
     """
-    data = pd.read_csv(gps_file, sep='\t', skiprows=[1]) # I needed to add lineterminator='\r' to work on mac
-    #print(data)
-    print(data.columns[-1].values)
-    harbor_data["gps_times"] = data.iloc[:, :3]
-    harbor_data["gps_altitude"] = data.iloc[:,-1]
-    print("altitude\n",data.iloc[:,-1])
+    hours = []
+    altitude = []
+    with open(gps_file, newline = '') as tabFile:
+        tabFile = csv.reader(tabFile, delimiter='\t')
+        next(tabFile, None)
+        next(tabFile, None)
+        for line in tabFile:
+            hours.append(float(line[0]) + (float(line[1])/60) + (float(line[2])/3600))
+            altitude.append(float(line[6]))
+    print(hours)
+    print(altitude)
 
 
 def interpolate_wx_from_gps(harbor_data):
