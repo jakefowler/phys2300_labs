@@ -10,8 +10,10 @@ framerate = 100
 steps_per_frame = 10
 x_coordinates = []
 y_coordinates = []
+theta_values = []
+time_values = []
 
-def f(r):
+def f_theta_omega(r):
     """
     Pendulum
     """
@@ -27,10 +29,10 @@ def main():
     """
     # Set up initial values
     h = 1.0/(framerate * steps_per_frame)
-    r = np.array([np.pi*179/180, 0], float)
+    angles = np.array([np.pi*30/180, 0], float)
     # Initial x and y
-    x = l*np.sin(r[0])
-    y = -l*np.cos(r[0])
+    x = l*np.sin(angles[0])
+    y = -l*np.cos(angles[0])
     
     ball = sphere(pos=vector(x, y, 0), radius=R, color=color.red)
     arm = cylinder(pos=vector(0, 0, 0), axis=vector(x, y, 0), radius=W)
@@ -42,26 +44,38 @@ def main():
     while t < 100:
             rate(100)
             # Use the 4'th order Runga-Kutta approximation
-            # #       for i in range(steps_per_frame):
-            r += h*f(r)
+            for i in range(steps_per_frame):
+                #rate(100)
+                k1 = h*f_theta_omega(angles)
+                k2 = h*f_theta_omega(angles+0.5*k1)
+                k3 = h*f_theta_omega(angles+0.5*k2)
+                k4 = h*f_theta_omega(angles+k3)
+                angles += (k1 + 2*k2 + 2*k3 + k4)/6
 
-            t += dt
-            # Update positions
-            x = l*np.sin(r[0])
-            y = -l*np.cos(r[0])
+                # Update positions
+                x = l*np.sin(angles[0])
+                y = -l*np.cos(angles[0])
 
-            ball.pos = vector(x, y, 0)
-            arm.axis = vector(x, y, 0)
+                ball.pos = vector(x, y, 0)
+                arm.axis = vector(x, y, 0)
 
-            x_coordinates.append(x)
-            y_coordinates.append(y)
-                
+                theta_values.append(angles[0])
+                time_values.append(t)
+
+                x_coordinates.append(x)
+                y_coordinates.append(y)
+                    
             # Update the cylinder axis
             # Update the pendulum's bob
 
     plt.plot(x_coordinates, y_coordinates)
     plt.show()
+    plt.plot(time_values, theta_values)
+    plt.ylabel("Theta in Radians")
+    plt.xlabel("Time in Seconds")
+    plt.title("Theta over time")
+    plt.show()
+    
 
 if __name__ == "__main__":
     main()
-   
