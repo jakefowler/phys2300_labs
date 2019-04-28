@@ -1,7 +1,9 @@
-'''
-Assignment to learn how to interpolate data
-Jacob Fowler
-'''
+"""
+This program takes data GPS and temperature data of a helium ballon from two different files. 
+One file is comma separated and the other is tab separated. The GPS data is a lot less frequent 
+so the data needed to be interpolated. There is also a lot of extra data from when the balloon
+was on the ground after that was stripped off. The data is then graphed.
+"""
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -135,10 +137,10 @@ def main():
     :return: Nothing
     """
     harbor_data = {}
-    wx_file = sys.argv[1]                   # first program input param
-    #wx_file = "./TempPressure.txt"
-    gps_file = sys.argv[2]                  # second program input param
-    #gps_file = "./GPSData.txt"
+    #wx_file = sys.argv[1]                   # first program input param
+    wx_file = "./TempPressure.txt"
+    #gps_file = sys.argv[2]                  # second program input param
+    gps_file = "./GPSData.txt"
 
     read_wx_data(wx_file, harbor_data)      # collect weather data
     read_gps_data(gps_file, harbor_data)    # collect gps data

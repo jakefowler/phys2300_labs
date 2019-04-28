@@ -171,8 +171,6 @@ def main(infile):
 
 
 if __name__ == "__main__":
-    # infile = 'data/CDO6674605799016.txt'  # for testing
-    # Note: the 0th argument is the program itself.
-    infile = sys.argv[1]
+    infile = 'data/CDO6674605799016.txt'  # for testing
+    #infile = sys.argv[1]
     main(infile)
-    # exit(0)
